@@ -1,8 +1,8 @@
 function procesarPago(producto) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
+    return new Promise(function(resolve, reject) {
+        setTimeout(function() {
             if (producto.trim() !== "") {
-                resolve(`Pago procesado correctamente para "${producto}"`);
+                resolve('Pago procesado correctamente para "' + producto + '"');
             } else {
                 reject("No se puede procesar el pago sin producto");
             }
@@ -11,38 +11,41 @@ function procesarPago(producto) {
 }
 
 function enviarPedido(direccion) {
-    return new Promise((resolve, reject) => {
+    return new Promise(function(resolve, reject) {
         if (direccion.trim() === "") {
             reject("Dirección de envío no válida");
             return;
         }
-        setTimeout(() => {
-            const errorAleatorio = Math.random() < 0.2;
+        setTimeout(function() {
+            var errorAleatorio = Math.random() < 0.2;
             if (errorAleatorio) {
                 reject("Error durante el envío, intente de nuevo.");
             } else {
-                resolve(`Pedido enviado correctamente a "${direccion}"`);
+                resolve('Pedido enviado correctamente a "' + direccion + '"');
             }
         }, 2000);
     });
 }
 
-document.getElementById("btnComprar").addEventListener("click", async () => {
-    const producto = document.getElementById("producto").value;
-    const direccion = document.getElementById("direccion").value;
-    const resultado = document.getElementById("resultado");
+document.getElementById("btnComprar").addEventListener("click", function() {
+    var producto = document.getElementById("producto").value;
+    var direccion = document.getElementById("direccion").value;
+    var resultado = document.getElementById("resultado");
 
     resultado.textContent = "Procesando compra...";
     resultado.style.color = "black";
 
-    try {
-        const mensajePago = await procesarPago(producto);
-        resultado.textContent = mensajePago + " | Enviando pedido...";
-        const mensajeEnvio = await enviarPedido(direccion);
-        resultado.textContent = mensajeEnvio;
-        resultado.style.color = "green";
-    } catch (error) {
-        resultado.textContent = error;
-        resultado.style.color = "red";
-    }
+    procesarPago(producto)
+        .then(function(mensajePago) {
+            resultado.textContent = mensajePago + " | Enviando pedido...";
+            return enviarPedido(direccion);
+        })
+        .then(function(mensajeEnvio) {
+            resultado.textContent = mensajeEnvio;
+            resultado.style.color = "green";
+        })
+        .catch(function(error) {
+            resultado.textContent = error;
+            resultado.style.color = "red";
+        });
 });
